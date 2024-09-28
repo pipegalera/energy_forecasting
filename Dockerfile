@@ -5,7 +5,7 @@ ENV TZ=UTC
 
 RUN apt-get update && apt-get install -y
 
-COPY .env ./
+#COPY .env ./
 COPY requirements.txt ./
 COPY src/data_refresh.py src/
 COPY src/data_backfill.py src/
