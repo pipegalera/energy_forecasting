@@ -40,9 +40,6 @@ jobs:
             -v ${{ github.workspace }}/data:/app/data \
             energy-forecasting:latest
 
-      - name: Debug - List data directory contents
-        run: ls -la ${{ github.workspace }}/data
-
       - name: Commit and push if it changed
         run: |
           git config --global user.name 'GitHub Action'
