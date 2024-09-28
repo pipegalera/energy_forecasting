@@ -1,7 +1,7 @@
 from data_backfill import eia_backfill_data
 import pandas as pd
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -18,7 +18,7 @@ def run_refresh():
     }
     last_date = pd.to_datetime(old_data['period'].max())
     start = (last_date + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
-    end = datetime.utcnow()
+    end = datetime.now(timezone.utc)
 
     new_data = eia_backfill_data(api_key=EIA_API_KEY,
                             api_path=API_PATH,
