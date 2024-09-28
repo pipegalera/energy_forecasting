@@ -22,25 +22,25 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: energy_forecasting/Dockerfile
+          file: ./Dockerfile
           push: false
           load: true
           tags: energy-forecasting:latest
 
       - name: Create data directory
-        run: mkdir -p ${{ github.workspace }}/data
+        run: mkdir -p ./data
 
-      - name: Run Docker container (data refresh)
+      - name: Run Docker container
         run: |
           docker run --rm \
             -e EIA_API_KEY=${{ secrets.EIA_API_KEY }} \
             -v ${{ github.workspace }}/data:/app/data \
             energy-forecasting:latest
 
-      - name: Commit and push if changes
+      - name: Commit and push if it changed
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
           git add data/
           git commit -m "Update data" || exit 0
           git push
