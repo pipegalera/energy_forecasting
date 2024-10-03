@@ -28,7 +28,6 @@ def eia_get_data(api_key,
                  facets=None):
 
     start = pd.to_datetime(start, utc=True).strftime("%Y-%m-%dT%H")
-    print("--> Retrieving data from:", start)
 
     api_path = api_path if api_path.endswith("/") else api_path + "/"
     url = "https://api.eia.gov/v2/" + api_path + 'data/'
@@ -50,18 +49,17 @@ def eia_get_data(api_key,
     #print(requests.get(url, params=parameters).url)
     #print(requests.get(url, params=parameters))
 
-    response = requests.get(url, params=parameters).json()
-
-    df = pd.DataFrame(response['response']['data'])
-
-    if df is None or df.empty:
-        return None
-    else:
+    try:
+        response = requests.get(url, params=parameters).json()
+        df = pd.DataFrame(response['response']['data'])
         df["value"] = pd.to_numeric(df["value"])
         df["period"] = pd.to_datetime(df["period"], utc=True)
         df = df[df["period"] > start] # For safety, the api retrieves data lazily (without caring the hours)
         df = df.sort_values(by=[df.columns[0], df.columns[3], df.columns[1]])
-    return df
+        return df
+    except:
+        return None
+
 
 def eia_backfill_data(api_key,
                 api_path,
@@ -75,26 +73,26 @@ def eia_backfill_data(api_key,
     all_data = []
     offset = 0
     while True:
-            df = eia_get_data(api_key = api_key,
-                              api_path = api_path,
-                              start = start,
-                              length = length,
-                              frequency = frequency,
-                              facets = facets,
-                              offset = offset)
+        df = eia_get_data(api_key = api_key,
+                api_path = api_path,
+                start = start,
+                length = length,
+                frequency = frequency,
+                facets = facets,
+                offset = offset)
 
-            if df is None or df.empty:
-                break
+        if df is None or df.empty:
+            break
 
-            all_data.append(df)
-            offset += length
+        all_data.append(df)
+        offset += length
 
-            print(f"Retrieved {len(df)} datapoints. Total datapoints so far: {sum(len(d) for d in all_data)}")
+        print(f"Retrieved {len(df)} datapoints. Total datapoints so far: {sum(len(d) for d in all_data)}")
 
-            # Print the last row of the most recently appended data
-            # print("Last row of the most recent data:")
-            # print(df.iloc[-1])
-            # print("\n")
+        # Print the last row of the most recently appended data
+        # print("Last row of the most recent data:")
+        # print(df.iloc[-1])
+        # print("\n")
 
     if refresh:
         if not all_data:

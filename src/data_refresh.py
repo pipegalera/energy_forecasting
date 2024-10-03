@@ -18,7 +18,7 @@ def run_refresh():
     }
     last_date = old_data['period'].max().tz_convert('UTC')
     start = (last_date + timedelta(hours=1))
-
+    print("--> Retrieving data from:", start)
     new_data = eia_backfill_data(api_key=EIA_API_KEY,
                             api_path=API_PATH,
                             start = start,
