@@ -2,11 +2,13 @@ import pandas as pd
 import numpy as np
 
 from darts import TimeSeries
-from darts.models import ExponentialSmoothing, ARIMA, VARIMA
+from darts.models import ExponentialSmoothing, ARIMA, VARIMA, NBEATSModel
 from darts.metrics import mape, mae, rmse, smape
 from darts.utils.utils import ModelMode
 from darts.models import NaiveDrift
 from darts import concatenate
+from darts.utils.callbacks import TFMProgressBar
+import torch
 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -19,6 +21,25 @@ df = pd.read_parquet(DATA_PATH)
 df.period = df.period.dt.tz_localize(None)
 df = df[["period", "subba", "value"]]
 subba_names = df['subba'].unique()
+
+
+def generate_torch_kwargs():
+    # Check if MPS is available
+    if torch.backends.mps.is_available():
+        device = "mps"
+    else:
+        device = "cpu"
+
+    return {
+        "pl_trainer_kwargs": {
+            "accelerator": device,
+            "devices": 1,
+            "callbacks": [TFMProgressBar(enable_train_bar_only=True)],
+            "precision": '32-true',  # Force 32-bit precision
+        },
+         "force_reset": True
+        }
+
 
 def print_testing(forecasts, train, test):
     print("Type of forecasts:", type(forecasts))
@@ -204,6 +225,18 @@ def timeseries_scatterplot(train, test, forecasts):
 
 if __name__=="__main__":
     df = complete_timeframe(df)
+
+    torch.manual_seed(1)
+    np.random.seed(1)
+    model = NBEATSModel(
+        input_chunk_length=24,
+        output_chunk_length=12,
+        n_epochs=100,
+        random_state=0,
+        **generate_torch_kwargs()
+    )
+    #model = NaiveDrift()
+
     series = TimeSeries.from_group_dataframe(
                                 df=df,
                                 group_cols='subba',
@@ -211,6 +244,6 @@ if __name__=="__main__":
                                 value_cols='value',
                                 freq='h')
     train, test = timeseries_train_test_split(series, test_size=0.8)
-    forecasts = forecasting(train, test, NaiveDrift())
+    forecasts = forecasting(train, test, model)
     #evaluate(forecasts, test)
     timeseries_scatterplot(train, test, forecasts)
