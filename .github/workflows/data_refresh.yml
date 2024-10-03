@@ -27,9 +27,6 @@ jobs:
           load: true
           tags: energy-forecasting:latest
 
-      - name: Debug - List Docker images
-        run: docker images
-
       - name: Create data directory
         run: mkdir -p ${{ github.workspace }}/data
 
