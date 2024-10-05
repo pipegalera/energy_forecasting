@@ -1,4 +1,4 @@
-name: Hourly Data Refresh
+name: Daily Data Refresh
 
 on:
   schedule:
