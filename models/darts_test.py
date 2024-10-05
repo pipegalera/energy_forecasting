@@ -69,6 +69,7 @@ def print_testing(forecasts, train, test):
         print("Width of first train item:", train[0].width)
         print("Start time of first train item:", train[0].start_time())
         print("End time of first train item:", train[0].end_time())
+
 def complete_timeframe(df):
 
     date_range = pd.date_range(start=df.period.min(),
@@ -81,8 +82,11 @@ def complete_timeframe(df):
 
     if len(df_combined) == len(date_range)*4:
         df = df_combined.merge(df, on=['period', 'subba'], how='left')
-        df['value'] = df.groupby('subba')['value'].bfill()
+
+    df['value'] = df.groupby('subba')['value'].bfill()
+
     return df
+
 def timeseries_train_test_split(series, test_size=0.8):
     train = []
     test = []
