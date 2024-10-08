@@ -29,6 +29,7 @@ def ModelTrainer(data,
                  target,
                  covs,
                  n_splits=5,
+                 save_model=False
                  ):
 
 
@@ -64,9 +65,15 @@ def ModelTrainer(data,
         preds.append(y_pred)
         scores.append(score)
 
+    if save_model:
+        xgb_model.save_model(f"models/xgb/xgb_model_{group}.json")
+
     print(f"Average RMSE across folds: {np.mean(scores):0.4f}")
 
     return model
+
+
+
 
 base_model = xgb.XGBRegressor(base_score=0.5,
                          booster='gbtree',
@@ -76,10 +83,12 @@ base_model = xgb.XGBRegressor(base_score=0.5,
                          max_depth=3,
                          learning_rate=0.01,)
 
-xgb_model = ModelTrainer(data=df,
-             group="PGAE",
-             model=base_model,
-             target='value',
-             covs=list(df.columns[25:]),
-             n_splits=5,
-            )
+for subba in df["subba"].unique():
+    xgb_model = ModelTrainer(data=df,
+                group=subba,
+                model=base_model,
+                target='value',
+                covs=list(df.columns[25:]),
+                n_splits=5,
+                save_model=True
+                )
