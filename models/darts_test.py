@@ -112,12 +112,14 @@ def timeseries_train_test_split(series, test_size=0.8):
         test.append(test_ts)
 
     return train, test
+
 def forecasting(train, test, model):
     combined_train = concatenate(train, axis=1)
     model.fit(combined_train)
     horizon = len(test[0])
     forecasts = model.predict(horizon)
     return forecasts
+
 def evaluate(forecasts, test):
     for i, x in enumerate(forecasts.components):
         print(f"Evaluating component: {x}")
@@ -125,6 +127,7 @@ def evaluate(forecasts, test):
         metric = rmse(test[i], forecasts[x])
         print(f"RMSE: {metric:.2f}")
         print()
+
 def timeseries_scatterplot(train, test, forecasts):
     fig = go.Figure()
     dropdown_options = []
