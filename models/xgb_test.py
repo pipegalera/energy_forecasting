@@ -9,7 +9,7 @@ os.chdir(HOME_PATH)
 import pandas as pd
 import numpy as np
 import datetime
-from src.utils import complete_timeframe, create_group_lags, create_group_rolling_means, create_date_colums
+from src.utils import complete_timeframe, create_group_lags, create_group_rolling_means, create_date_colums, create_horizon
 
 import xgboost as xgb
 from sklearn.metrics import root_mean_squared_error
@@ -17,11 +17,11 @@ from sklearn.model_selection import TimeSeriesSplit
 
 df = pd.read_parquet(DATA_PATH)
 df = (df.pipe(complete_timeframe, bfill=True)
+        .pipe(create_horizon, 'subba', horizon_days=60)
         .pipe(create_group_lags, 'subba', ['value'], lags=[3,6,12,24,48,168,336,720,2160])
         .pipe(create_group_rolling_means, 'subba', ['value'], windows=[3,6,12,24,48,168,336,720,2160])
         .pipe(create_date_colums, 'period')
      )
-
 
 def ModelTrainer(data,
                  group,
@@ -37,7 +37,7 @@ def ModelTrainer(data,
                           test_size=24*365*1,
                           gap=24)
     print(f"Training group: {group}...")
-    df = data[data["subba"] == group]
+    df = data[(data["subba"] == group) & (data["data_type"] == "Real values")].set_index("period")
     df = df.sort_index()
 
     preds = []
@@ -73,8 +73,6 @@ def ModelTrainer(data,
     return model
 
 
-
-
 base_model = xgb.XGBRegressor(base_score=0.5,
                          booster='gbtree',
                          n_estimators=1000,
@@ -83,12 +81,19 @@ base_model = xgb.XGBRegressor(base_score=0.5,
                          max_depth=3,
                          learning_rate=0.01,)
 
+covs = ['period_day',
+        'period_week', 'period_year',
+        'period_day_of_week','period_day_of_year',
+        'period_month_end', 'period_month_start',
+        'period_year_end', 'period_year_start',
+        'period_quarter_end', 'period_quarter_start',]
+
 for subba in df["subba"].unique():
     xgb_model = ModelTrainer(data=df,
                 group=subba,
                 model=base_model,
                 target='value',
-                covs=list(df.columns[25:]),
+                covs=covs,
                 n_splits=5,
                 save_model=True
                 )
