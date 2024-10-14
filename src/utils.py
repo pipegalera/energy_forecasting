@@ -21,26 +21,7 @@ def complete_timeframe(data, bfill=False):
         df['value'] = df.groupby('subba')['value'].bfill()
 
     return df
-def create_horizon(data, groups_column, horizon_days=60):
-
-    df = data.copy()
-    df['data_type'] = "Real values"
-
-    horizon = df["period"].max() + datetime.timedelta(days=horizon_days)
-    last_period = df["period"].max() + datetime.timedelta(hours=1)
-
-    all_predictions_df = pd.DataFrame()
-    for i in data[groups_column].unique():
-        predictions_df = pd.date_range(last_period, horizon, freq='1h')
-        predictions_df = pd.DataFrame({"period":predictions_df})
-        predictions_df[groups_column] = i
-        predictions_df['data_type'] = "Predicted values"
-
-        all_predictions_df = pd.concat([all_predictions_df, predictions_df])
-
-    return pd.concat([df, all_predictions_df]).sort_values([groups_column, 'period'])
 def create_group_lags(data, group_column, target_columns, lags):
-
     df = data.copy()
     for col in target_columns:
         for lag in lags:
@@ -66,6 +47,7 @@ def create_date_colums(data, date_column):
 
     df = data.copy()
 
+    df[f'{date_column}_hour'] = df[date_column].dt.hour
     df[f'{date_column}_day'] = df[date_column].dt.day
     df[f'{date_column}_week'] = df[date_column].dt.isocalendar().week.astype('int32')
     df[f'{date_column}_year'] = df[date_column].dt.year
@@ -79,6 +61,24 @@ def create_date_colums(data, date_column):
     df[f'{date_column}_year_start'] = df[date_column].dt.is_quarter_start
 
     return df
+def create_horizon(data, groups_column, horizon_days=30):
+
+    df = data.copy()
+    horizon = df["period"].max() + datetime.timedelta(days=horizon_days)
+    last_period = df["period"].max() + datetime.timedelta(hours=1)
+
+    all_predictions_df = pd.DataFrame()
+    for i in data[groups_column].unique():
+        predictions_df = pd.date_range(last_period, horizon, freq='1h')
+        predictions_df = pd.DataFrame({"period":predictions_df})
+        predictions_df[groups_column] = i
+
+        all_predictions_df = pd.concat([all_predictions_df, predictions_df]).sort_values([groups_column, 'period'])
+
+    return all_predictions_df
+
+
+
 
 # def test_stationarity(timeseries):
 #     result = adfuller(timeseries, autolag='AIC')
