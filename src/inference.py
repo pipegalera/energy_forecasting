@@ -1,8 +1,8 @@
 #from dotenv import load_dotenv
 #load_dotenv()
-#import sys
-#import os
-#sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.utils import create_date_colums, create_horizon
 import pandas as pd
@@ -27,7 +27,7 @@ def make_predictions(data, covs = covariates, save_file=True):
         df_subba = df[df["subba"]== subba][covs]
 
         # Model
-        model.load_model("models/xgb/xgb_model_{subba}.json")
+        model.load_model(f"./models/xgb/xgb_model_{subba}.json")
         prediction = model.predict(df_subba)
         predictions.extend(prediction)
 
@@ -54,5 +54,5 @@ if __name__=="__main__":
 
     # Inference
     make_predictions(horizon)
-    print("--> Done! Predictions saved at: ./data/")
+    print("--> Done! Predictions saved at: ./data/inference.parquet")
     print("---------------------------------------------")
