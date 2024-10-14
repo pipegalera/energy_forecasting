@@ -5,11 +5,10 @@ from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 load_dotenv()
 
-DATA_PATH = os.getenv("DATA_PATH")
 EIA_API_KEY = os.getenv('EIA_API_KEY')
 
 def run_refresh():
-    old_data = pd.read_parquet(DATA_PATH + "data.parquet")# ./data/data.parquet
+    old_data = pd.read_parquet("./data/data.parquet")
     print("--> Rows before:",  f"{len(old_data):,}")
     print("--> Current data updated until:", old_data.period.max().strftime("%Y-%m-%dT%H"))
 

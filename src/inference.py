@@ -1,17 +1,12 @@
-from dotenv import load_dotenv
-load_dotenv()
-import sys
-import os
-DATA_PATH = os.getenv("DATA_PATH")
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+#from dotenv import load_dotenv
+#load_dotenv()
+#import sys
+#import os
+#sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.utils import create_date_colums, create_horizon
 import pandas as pd
 import xgboost as xgb
-
-HOME_PATH = os.getenv("HOME_PATH")
-DATA_PATH = os.getenv("DATA_PATH")
-MODELS_PATH = os.getenv("MODELS_PATH")
 
 covariates = ['period_hour','period_day','period_week', 'period_year',
         'period_day_of_week','period_day_of_year',
@@ -32,7 +27,7 @@ def make_predictions(data, covs = covariates, save_file=True):
         df_subba = df[df["subba"]== subba][covs]
 
         # Model
-        model.load_model(MODELS_PATH + f"/xgb/xgb_model_{subba}.json")
+        model.load_model("models/xgb/xgb_model_{subba}.json")
         prediction = model.predict(df_subba)
         predictions.extend(prediction)
 
@@ -40,12 +35,12 @@ def make_predictions(data, covs = covariates, save_file=True):
     df["value"] = predictions
 
     if save_file:
-        df.to_parquet(DATA_PATH + "inference.parquet", index=False)
+        df.to_parquet("./data/inference.parquet", index=False)
     else:
         return df
 
 if __name__=="__main__":
-    df = pd.read_parquet(DATA_PATH + "data_preprocessed.parquet")
+    df = pd.read_parquet("./data/data_preprocessed.parquet")
     horizon_days = 30
     print(f"--> Creating new predictions for the next {horizon_days} days inference.parquet...")
 
@@ -59,5 +54,5 @@ if __name__=="__main__":
 
     # Inference
     make_predictions(horizon)
-    print("--> Done! Predictions saved at:", DATA_PATH)
+    print("--> Done! Predictions saved at: ./data/")
     print("---------------------------------------------")
