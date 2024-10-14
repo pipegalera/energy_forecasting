@@ -29,6 +29,7 @@ def run_refresh():
 
     print("--> Rows after:", f"{len(new_data):,}")
     print("--> New Data Updated until:", new_data.period.max().strftime("%Y-%m-%dT%H"))
+    print("---------------------------------------------")
 
 if __name__=="__main__":
     run_refresh()

@@ -47,7 +47,7 @@ def make_predictions(data, covs = covariates, save_file=True):
 if __name__=="__main__":
     df = pd.read_parquet(DATA_PATH + "data_preprocessed.parquet")
     horizon_days = 30
-    print(f"Creating new predictions for the next {horizon_days} days inference.parquet...")
+    print(f"--> Creating new predictions for the next {horizon_days} days inference.parquet...")
 
     # Create df of future dates
     horizon = create_horizon(data=df,
@@ -59,4 +59,5 @@ if __name__=="__main__":
 
     # Inference
     make_predictions(horizon)
-    print("Done! Predictions saved at:", DATA_PATH)
+    print("--> Done! Predictions saved at:", DATA_PATH)
+    print("---------------------------------------------")

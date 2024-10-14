@@ -10,7 +10,7 @@ from src.utils import complete_timeframe, create_group_lags, create_group_rollin
 
 
 if __name__=="__main__":
-    print("Reading raw data.parquet...")
+    print("--> Reading raw data.parquet...")
     df = pd.read_parquet(f"{DATA_PATH}/data.parquet")
     df = (df.pipe(complete_timeframe, bfill=True)
             #.pipe(create_horizon, 'subba', horizon_days=60)
@@ -19,6 +19,7 @@ if __name__=="__main__":
             .pipe(create_date_colums, 'period')
          )
     df = df.sort_values(['subba', 'period'])
-    print("Preprocessing data...")
+    print("--> Preprocessing data...")
     df.to_parquet(f"{DATA_PATH}/data_preprocessed.parquet")
-    print("Done! New data_preprocessed.parquet file updated")
+    print("--> Done! New data_preprocessed.parquet file updated")
+    print("---------------------------------------------")
