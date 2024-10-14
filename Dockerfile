@@ -11,5 +11,6 @@ COPY run_scripts.sh ./
 
 
 RUN pip install --upgrade pip && pip install -r /app/requirements.txt
+RUN chmod +x ./run_scripts.sh
 
 CMD ["./run_scripts.sh"]
