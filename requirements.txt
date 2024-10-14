@@ -4,5 +4,4 @@ scikit-learn
 plotly
 requests
 python-dotenv
-ipykernel
 xgboost
