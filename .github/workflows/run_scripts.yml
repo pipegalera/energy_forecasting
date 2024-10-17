@@ -35,7 +35,7 @@ jobs:
       - name: Run Docker container
         run: |
           docker run --rm \
-            -e EIA_API_KEY=${{ secrets.EIA_API_KEY }} \
+            -e DATA_PATH -e EIA_API_KEY -e MODELS_PATH \
             -v ${{ github.workspace }}/data:/app/data \
             energy-forecasting:latest \
             bash /app/run_scripts.sh
