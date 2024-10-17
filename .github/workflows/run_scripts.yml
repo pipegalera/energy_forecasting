@@ -35,11 +35,12 @@ jobs:
       - name: Run Docker container
         run: |
           docker run --rm \
-            -e DATA_PATH -e EIA_API_KEY -e MODELS_PATH \
+            -e EIA_API_KEY=${{ secrets.EIA_API_KEY }} \
+            -e DATA_PATH=${{ secrets.DATA_PATH }} \
+            -e MODELS_PATH=${{ secrets.MODELS_PATH }} \
             -v ${{ github.workspace }}/data:/app/data \
             energy-forecasting:latest \
             bash /app/run_scripts.sh
-      - name: Commit and pull/push if it changed
         run: |
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
