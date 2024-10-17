@@ -6,7 +6,9 @@ on:
   workflow_dispatch: # This allows manual triggering
 
 env:
+  DATA_PATH: ${{ secrets.DATA_PATH }}
   EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+  MODELS_PATH: ${{ secrets.MODELS_PATH }}
 
 jobs:
   refresh_data:
