@@ -92,4 +92,3 @@ if __name__=="__main__":
     df_inference.to_parquet(f"{DATA_PATH}/inference.parquet")
     print(f"--> Done! Predictions saved at: {DATA_PATH}/inference.parquet")
     print("---------------------------------------------")
-    print(df_inference.head())
