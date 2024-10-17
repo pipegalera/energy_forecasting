@@ -61,21 +61,7 @@ def create_date_colums(data, date_column):
     df[f'{date_column}_year_start'] = df[date_column].dt.is_quarter_start
 
     return df
-def create_horizon(data, groups_column, horizon_days=30):
 
-    df = data.copy()
-    horizon = df["period"].max() + datetime.timedelta(days=horizon_days)
-    last_period = df["period"].max() + datetime.timedelta(hours=1)
-
-    all_predictions_df = pd.DataFrame()
-    for i in data[groups_column].unique():
-        predictions_df = pd.date_range(last_period, horizon, freq='1h')
-        predictions_df = pd.DataFrame({"period":predictions_df})
-        predictions_df[groups_column] = i
-
-        all_predictions_df = pd.concat([all_predictions_df, predictions_df]).sort_values([groups_column, 'period'])
-
-    return all_predictions_df
 
 
 
