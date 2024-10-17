@@ -5,8 +5,10 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 load_dotenv()
 
+DATA_PATH = os.getenv("DATA_PATH")
 EIA_API_KEY = os.getenv('EIA_API_KEY')
 API_PATH = "electricity/rto/region-sub-ba-data/"
+
 facets = {
     'parent': ['CISO'],
     'subba': ['PGAE', 'SCE', 'SDGE', 'VEA'],
@@ -87,7 +89,7 @@ def eia_backfill_data(api_key,
         all_data.append(df)
         offset += length
 
-        print(f"Retrieved {len(df)} datapoints. Total datapoints so far: {sum(len(d) for d in all_data)}")
+        print(f"Retrieved {len(df)} datapoints.")
 
         # Print the last row of the most recently appended data
         # print("Last row of the most recent data:")
@@ -97,16 +99,17 @@ def eia_backfill_data(api_key,
     if refresh:
         if not all_data:
             print("--> No new data found in the API")
-            df = pd.read_parquet("./data/data.parquet")
+            df = pd.read_parquet(f"{DATA_PATH}/data.parquet")
         else: # else = there is new data
             df = pd.concat([
-                pd.read_parquet("./data/data.parquet"),
+                pd.read_parquet(f"{DATA_PATH}/data.parquet"),
                 pd.concat(all_data, ignore_index=True)
-            ])
-            df.to_parquet("./data/data.parquet", index=False)
+            ]).sort_values(by=["subba","period"])
+            df.to_parquet(f"{DATA_PATH}/data.parquet", index=False)
     else: # else = new backfill
-        df = pd.concat(all_data, ignore_index=True)
-        df.to_parquet("./data/data.parquet", index=False)
+        df = pd.concat(all_data, ignore_index=True).sort_values(by=["subba","period"])
+        df.to_parquet(f"{DATA_PATH}/data.parquet", index=False)
+        print(f"Total datapoints writen so far: {sum(len(d) for d in all_data)}")
 
     return df
 
