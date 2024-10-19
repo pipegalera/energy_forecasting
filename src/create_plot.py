@@ -159,5 +159,5 @@ def main(data):
 if __name__=="__main__":
     df = pd.read_parquet(f"{DATA_PATH}/inference.parquet")
     fig = main(df)
-    fig.write_html(f"{HOME_PATH}/dashboard/plot.html")
+    fig.write_html(f"{HOME_PATH}/docs/plot.html")
     print("--> Visualization updated!")
