@@ -18,8 +18,8 @@ def run_refresh():
         'parent': ['CISO'],
         'subba': ['PGAE', 'SCE', 'SDGE', 'VEA'],
     }
-    last_date = old_data['period'].max().tz_convert('UTC')
-    print(f"--> Retrieving data from: {last_date.strftime("%Y-%m-%dT%H")} ...")
+    last_date = old_data['period'].max().tz_convert('UTC').strftime("%Y-%m-%dT%H")
+    print(f"--> Retrieving data from: {last_date} ...")
     new_data = eia_backfill_data(api_key=EIA_API_KEY,
                             api_path=API_PATH,
                             start = last_date,
