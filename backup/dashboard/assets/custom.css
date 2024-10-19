@@ -1,0 +1,100 @@
+body,
+.dash-markdown {
+    font-family: "Open Sans", verdana, arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+    color: #2c3e50;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 20px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    color: #2c3e50;
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+p,
+label {
+    color: #34495e;
+    line-height: 1.6;
+    margin-right: 10px;
+    align-self: center;
+}
+
+.dropdown-container {
+    margin: 20px 0;
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.dash-dropdown {
+    font-family: "Open Sans", verdana, arial, sans-serif;
+    width: 100%;
+    max-width: 300px;
+}
+
+.footer {
+    font-size: 14px;
+    color: #7f8c8d;
+}
+
+.dash-dropdown {
+    font-family: "Open Sans", verdana, arial, sans-serif;
+    width: 100%;
+    max-width: 300px;
+}
+
+/* Styles for dropdown options */
+.Select-control,
+.Select-menu-outer,
+.Select-value-label {
+    font-family: "Open Sans", verdana, arial, sans-serif !important;
+}
+
+/* Ensure the placeholder text also uses the correct font */
+.Select-placeholder,
+.Select--single > .Select-control .Select-value {
+    font-family: "Open Sans", verdana, arial, sans-serif !important;
+}
+
+.button-container {
+    margin: 20px 0;
+}
+
+.region-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.region-buttons .btn {
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .region-buttons {
+        flex-direction: column;
+    }
+
+    .region-buttons .btn {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+}

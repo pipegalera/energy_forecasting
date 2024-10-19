@@ -2,16 +2,14 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+from dotenv import load_dotenv
+load_dotenv()
+import os
+DATA_PATH = os.getenv("DATA_PATH")
 
-
-
-df = pd.read_parquet("data/inference.parquet")
-df = df[['period', 'subba', 'value', 'forecasted_value']].sort_values(by=["subba","period"])
-cutoff_date = df["period"].iloc[-1] - pd.Timedelta(days=50)
-
-
+df = pd.read_parquet(f"{DATA_PATH}/inference.parquet")
 subba_options = df['subba'].unique().tolist()
-df = df[df["period"] > cutoff_date]
+
 
 
 # Create figure with secondary y-axis
@@ -22,8 +20,20 @@ def get_traces(selected_subba):
     filtered_df = df[df['subba'] == selected_subba]
 
     traces = [
-        go.Scatter(x=filtered_df.period, y=filtered_df.value, mode='lines', name='Demand', line=dict(color='teal')),
-        go.Scatter(x=filtered_df.period, y=filtered_df.forecasted_value, mode='lines', name='Demand Forecast', line=dict(dash='dash', color='blue'))
+        go.Scatter(x=filtered_df.period,
+                   y=filtered_df.value,
+                   mode='lines',
+                   name='Demand',
+                   line=dict(color='rgb(31,119,180)'),
+                   hovertemplate='Demand: %{y:.2f} MWh'
+        ),
+        go.Scatter(x=filtered_df.period,
+                   y=filtered_df.forecasted_value,
+                   mode='lines',
+                   name='Demand Forecast',
+                   line=dict(color='rgb(69,123,157)', dash='dash', width=2),
+                   hovertemplate='Forecast: %{y:.2f} MWh'
+        )
     ]
 
     # Compute residuals and standard deviation
@@ -38,11 +48,11 @@ def get_traces(selected_subba):
         x=filtered_df.period.tolist() + filtered_df.period.tolist()[::-1],
         y=upper_bound.tolist() + lower_bound.tolist()[::-1],
         fill='toself',
-        fillcolor='rgba(173, 216, 230, 0.3)',
-        line=dict(color='rgba(255,255,255,0)'),
+        fillcolor='rgba(69,123,157,0.2)',
+        line=dict(color='rgba(69,123,157,0.4)'),
         hoverinfo="skip",
         showlegend=True,
-        name='Forecast Error Bands'
+        name='Prediction Intervals'
     ))
 
     return traces
@@ -61,16 +71,6 @@ dropdown_buttons = [dict(
     method='update'
 ) for i, subba in enumerate(subba_options)]
 
-fig.update_layout(
-    updatemenus=[dict(
-        active=0,
-        buttons=dropdown_buttons,
-        x=1,
-        y=1.3,
-        xanchor='left',
-        yanchor='top'
-    )]
-)
 
 # Set initial visibility
 fig.data[0].visible = True
@@ -79,23 +79,51 @@ fig.data[2].visible = True
 for i in range(3, len(fig.data)):
     fig.data[i].visible = False
 
-# Update layout
 fig.update_layout(
     title=f"California Demand for Electricity Forecast - Region: {subba_options[0]}",
     xaxis_title="",
     yaxis_title="Electricity Demand (MWh)",
     template='plotly_white',
-    showlegend=True
+    showlegend=True,
+    hovermode="x unified",
+    hoverlabel=dict(
+        bgcolor="white",
+        font_size=12,
+    ),
+    hoverdistance=100,
+    spikedistance=1000,
+    xaxis=dict(
+        showspikes=True,
+        spikethickness=2,
+        spikedash="dot",
+        spikecolor="#999999",
+        spikemode="across"
+    ),
+    legend=dict(
+            traceorder="normal",
+            font=dict(size=12),
+            yanchor="top",
+            y=0.99,
+            xanchor="left",
+            x=1.05,
+            bgcolor="rgba(255, 255, 255, 0.5)",
+        ),
+        updatemenus=[
+            dict(
+                buttons=dropdown_buttons,
+                direction="down",
+                pad={"r": 12, "t": 12},
+                showactive=True,
+                x=1.05,
+                xanchor="left",
+                y=1.1,
+                yanchor="top",
+                bgcolor="rgba(255, 255, 255, 0.5)",
+                bordercolor="rgba(69,123,157,0.2)",
+                borderwidth=1,
+            )
+        ]
 )
-
-# Add MAPE and Coverage as annotations (you'll need to calculate these for each subba)
-#fig.add_annotation(
-#    xref="paper", yref="paper",
-#    x=1.14, y=0.4,
-#    text=f"MAPE: {MAPE}%<br>Coverage: {coverage}%",
-#    align="left",
-#    showarrow=False
-#)
 
 # Add source annotation
 fig.add_annotation(

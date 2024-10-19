@@ -19,11 +19,10 @@ def run_refresh():
         'subba': ['PGAE', 'SCE', 'SDGE', 'VEA'],
     }
     last_date = old_data['period'].max().tz_convert('UTC')
-    start = (last_date + timedelta(hours=1))
-    print("--> Retrieving data from:", start.strftime("%Y-%m-%dT%H"))
+    print(f"--> Retrieving data from: {last_date.strftime("%Y-%m-%dT%H")} ...")
     new_data = eia_backfill_data(api_key=EIA_API_KEY,
                             api_path=API_PATH,
-                            start = start,
+                            start = last_date,
                             length = 5000,
                             frequency = "hourly",
                             facets=facets,
