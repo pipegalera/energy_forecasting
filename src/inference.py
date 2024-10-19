@@ -82,9 +82,14 @@ def main(days):
 
     print("--> Creating new inference file updated...")
     preds = preds.merge(df, on=["period", "subba"], how="left")
+
+    # Limit the data horizon
     current_time_utc = datetime.datetime.now(datetime.timezone.utc)
     predictions_cutoff_date = current_time_utc - datetime.timedelta(days=2)
     preds.loc[preds['period'] < predictions_cutoff_date, 'forecasted_value'] = np.nan
+
+    # Delete columns
+    preds = preds[["period", "subba", "value", "forecasted_value"]]
 
     preds.to_parquet(f"{DATA_PATH}/inference.parquet")
     print(f"--> Done! Predictions saved at: {DATA_PATH}/inference.parquet")
