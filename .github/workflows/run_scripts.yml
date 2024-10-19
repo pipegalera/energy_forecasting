@@ -38,6 +38,7 @@ jobs:
             -e EIA_API_KEY=${{ secrets.EIA_API_KEY }} \
             -e DATA_PATH=${{ secrets.DATA_PATH }} \
             -e MODELS_PATH=${{ secrets.MODELS_PATH }} \
+            -e HOME_PATH=${{ secrets.HOME_PATH }} \
             -v ${{ github.workspace }}/data:/app/data \
             energy-forecasting:latest \
             bash /app/run_scripts.sh
