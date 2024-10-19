@@ -89,7 +89,7 @@ def eia_backfill_data(api_key,
         all_data.append(df)
         offset += length
 
-        print(f"Retrieved {len(df)} datapoints.")
+        print(f"--> Retrieved {len(df)} datapoints.")
 
         # Print the last row of the most recently appended data
         # print("Last row of the most recent data:")
@@ -116,9 +116,9 @@ def eia_backfill_data(api_key,
 if __name__== "__main__":
     # Backfill of data
     eia_backfill_data(api_key=EIA_API_KEY,
-                            api_path=API_PATH,
-                            start = '2019-01-01',
-                            length = 5000,
-                            frequency = "hourly",
-                            facets=facets,
-                            refresh=False)
+                      api_path=API_PATH,
+                      start = '2019-01-01',
+                      length = 5000,
+                      frequency = "hourly",
+                      facets=facets,
+                      refresh=False)
