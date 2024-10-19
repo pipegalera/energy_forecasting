@@ -6,6 +6,8 @@ import datetime
 from utils import create_date_colums
 import pandas as pd
 import xgboost as xgb
+import argparse
+import numpy as np
 
 DATA_PATH = os.getenv("DATA_PATH")
 MODELS_PATH = os.getenv("MODELS_PATH")
@@ -17,7 +19,7 @@ covariates = ['period_hour','period_day','period_week', 'period_year',
         'period_quarter_end', 'period_quarter_start',]
 
 
-def create_horizon_dates(data, groups_column, days_after, days_before=False):
+def create_horizon_dates(data, groups_column, days_before=False, days_after=0):
 
     df = data.copy()
 
@@ -37,7 +39,7 @@ def create_horizon_dates(data, groups_column, days_after, days_before=False):
 
     return all_predictions_df
 
-def make_predictions(data, covs = covariates, save_file=True):
+def make_predictions(data, covs = covariates):
 
     df = data.copy()
 
@@ -64,31 +66,33 @@ def make_predictions(data, covs = covariates, save_file=True):
     return df
 
 
-if __name__=="__main__":
+def main(days):
 
     df = pd.read_parquet(f"{DATA_PATH}/data.parquet")
-    days = 30
 
     print(f"--> Creating new forecasts for the next {days} days")
     df_horizon = create_horizon_dates(data=df,
-                                    groups_column='subba',
-                                    days_after=days,
-                                    days_before=days)
+                                      groups_column='subba',
+                                      days_before=days,
+                                      days_after=days)
     df_horizon = create_date_colums(df_horizon, 'period')
 
-    print(f"--> Loading models and running predictions...")
-    df_inference = make_predictions(data=df_horizon, covs = covariates, save_file=False)
+    print("--> Loading models and running predictions...")
+    preds = make_predictions(data=df_horizon, covs = covariates)
 
-    output_file = f"{DATA_PATH}/inference.parquet"
-    if os.path.exists(output_file):
-            print(f"--> Appending new data to inference.parquet...")
-            existing_df = pd.read_parquet(output_file)
-            df_inference = df.merge(df_inference, on=["period", "subba"], how="outer")
-            df_inference = pd.concat([existing_df, df_inference]).drop_duplicates(subset=["period", "subba"])
-    else:
-        print(f"--> Did not find inference.parquet. Creating new file...")
-        df_inference = df.merge(df_inference, on=["period", "subba"], how="outer")
+    print("--> Creating new inference file updated...")
+    preds = preds.merge(df, on=["period", "subba"], how="left")
+    current_time_utc = datetime.datetime.now(datetime.timezone.utc)
+    predictions_cutoff_date = current_time_utc - datetime.timedelta(days=2)
+    preds.loc[preds['period'] < predictions_cutoff_date, 'forecasted_value'] = np.nan
 
-    df_inference.to_parquet(f"{DATA_PATH}/inference.parquet")
+    preds.to_parquet(f"{DATA_PATH}/inference.parquet")
     print(f"--> Done! Predictions saved at: {DATA_PATH}/inference.parquet")
     print("---------------------------------------------")
+
+if __name__=="__main__":
+    parser = argparse.ArgumentParser(description='Energy Forecasting Inference')
+    parser.add_argument('--days', type=int, default=3, help='Number of days to forecast')
+    args = parser.parse_args()
+
+    main(args.days)
