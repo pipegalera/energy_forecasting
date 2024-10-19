@@ -32,6 +32,9 @@ jobs:
       - name: Create data directory
         run: mkdir -p ${{ github.workspace }}/data
 
+      - name: Create docs directory
+        run: mkdir -p ${{ github.workspace }}/docs
+
       - name: Run Docker container
         run: |
           docker run --rm \
