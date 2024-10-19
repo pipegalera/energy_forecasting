@@ -100,4 +100,3 @@ if __name__=="__main__":
     parser.add_argument('--days', type=int, default=3, help='Number of days to forecast')
     args = parser.parse_args()
     main(args.days)
-    print(os.getcwd())
