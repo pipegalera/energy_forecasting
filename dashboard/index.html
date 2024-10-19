@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>CA Electricity Demand Forecast</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <h1>Short Term Forecast of Electricity Demand in California</h1>
+            </header>
+            <main>
+                <section class="intro">
+                    <p>
+                        This dashboard shows the latest data on electricity
+                        demand for the main 4 primary electric utility companies
+                        in California:
+                    </p>
+                    <ul>
+                        <li>Pacific Gas and Electric (PGAE)</li>
+                        <li>Southern California Edison (SCE)</li>
+                        <li>San Diego Gas and Electric (SDGE)</li>
+                        <li>Valley Electric Association (VEA)</li>
+                    </ul>
+                </section>
+                <section class="visualization">
+                    <iframe src="plot.html" frameborder="0"></iframe>
+                </section>
+            </main>
+            <footer>
+                <p>
+                    <strong>Data Source:</strong> U.S. Energy Information
+                    Administration - EIA - Independent Statistics and Analysis
+                </p>
+                <p>
+                    <strong>Forecasting:</strong> XGBoost. Forecast error bands
+                    based on 3 standard error from the residuals.
+                </p>
+            </footer>
+        </div>
+    </body>
+</html>
