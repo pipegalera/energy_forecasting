@@ -43,6 +43,7 @@ jobs:
             -e MODELS_PATH=${{ secrets.MODELS_PATH }} \
             -e HOME_PATH=${{ secrets.HOME_PATH }} \
             -v ${{ github.workspace }}/data:/app/data \
+            -v ${{ github.workspace }}/docs:/app/docs \
             energy-forecasting:latest \
             bash /app/run_scripts.sh
       - name: Commit and pull/push if it changed
