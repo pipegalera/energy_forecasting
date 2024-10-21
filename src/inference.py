@@ -70,7 +70,7 @@ def main(days):
 
     df = pd.read_parquet(f"{DATA_PATH}/data.parquet")
 
-    print(f"--> Creating new forecasts for the next {days} days")
+    print(f"--> Creating new forecasts for the next {days} days...")
     df_horizon = create_horizon_dates(data=df,
                                       groups_column='subba',
                                       days_before=days,
