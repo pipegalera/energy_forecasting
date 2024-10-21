@@ -3,20 +3,33 @@ load_dotenv()
 import sys
 import os
 import datetime
-from utils import create_date_colums
+from utils import complete_timeframe, create_group_lags, create_group_rolling_means, create_date_colums
 import pandas as pd
 import xgboost as xgb
 import argparse
 import numpy as np
+import mlflow
+import json
 
+mlflow.set_tracking_uri(f"sqlite:///mlflow/mlflow.db")
 DATA_PATH = os.getenv("DATA_PATH")
 MODELS_PATH = os.getenv("MODELS_PATH")
 
-covariates = ['period_hour','period_day','period_week', 'period_year',
-        'period_day_of_week','period_day_of_year',
-        'period_month_end', 'period_month_start',
-        'period_year_end', 'period_year_start',
-        'period_quarter_end', 'period_quarter_start',]
+# Load RUN IDs from MLflow
+with open(f"{MODELS_PATH}/run_id_mapping.json", "r") as f:
+    run_id_mapping = json.load(f)
+
+covs = ['value_lag_3', 'value_lag_6', 'value_lag_12',
+       'value_lag_24', 'value_lag_48', 'value_lag_168', 'value_lag_336',
+       'value_lag_720', 'value_lag_2160', 'value_rolling_mean_3_hours',
+       'value_rolling_mean_6_hours', 'value_rolling_mean_12_hours',
+       'value_rolling_mean_24_hours', 'value_rolling_mean_48_hours',
+       'value_rolling_mean_168_hours', 'value_rolling_mean_336_hours',
+       'value_rolling_mean_720_hours', 'value_rolling_mean_2160_hours',
+       'period_hour', 'period_day', 'period_week', 'period_year',
+       'period_day_of_week', 'period_day_of_year', 'period_month_end',
+       'period_month_start', 'period_quarter_end', 'period_quarter_start',
+       'period_year_end', 'period_year_start']
 
 
 def create_horizon_dates(data, groups_column, days_before=False, days_after=0):
@@ -39,26 +52,26 @@ def create_horizon_dates(data, groups_column, days_before=False, days_after=0):
 
     return all_predictions_df
 
-def make_predictions(data, covs = covariates):
+def make_predictions(data, covs = covs):
 
     df = data.copy()
 
-    model = xgb.XGBRegressor()
     predictions = []
     subbas = df["subba"].unique()
 
     for subba in subbas:
-        # Data
-        df_subba = df[df["subba"]== subba][covs]
 
-        # Model
-        model.load_model(f"{MODELS_PATH}/xgb/xgb_model_{subba}.json")
+        df_subba = df[df["subba"] == subba][covs]
+
+        # Load model
+        run_id = run_id_mapping.get(subba)
+        model_uri = f"runs:/{run_id}/xgboost_model_{subba}"
+        model = mlflow.xgboost.load_model(model_uri)
+
         prediction = model.predict(df_subba)
         predictions.extend(prediction)
 
     df["forecasted_value"] = predictions
-
-    # Formatting
     df["forecasted_value"] = df["forecasted_value"].astype('int32')
 
     df.drop(covs, axis=1, inplace=True)
@@ -75,10 +88,17 @@ def main(days):
                                       groups_column='subba',
                                       days_before=days,
                                       days_after=days)
-    df_horizon = create_date_colums(df_horizon, 'period')
+
+    # PREP DATA
+    df_horizon = (df_horizon
+                    .pipe(create_group_lags, 'subba', ['value'], lags=[3,6,12,24,48,168,336,720,2160])
+                    .pipe(create_group_rolling_means, 'subba', ['value'], windows=[3,6,12,24,48,168,336,720,2160])
+                    .pipe(create_date_colums, 'period')
+         )
+    df = df.sort_values(['subba', 'period'])
 
     print("--> Loading models and running predictions...")
-    preds = make_predictions(data=df_horizon, covs = covariates)
+    preds = make_predictions(data=df_horizon, covs = covs)
 
     print("--> Creating new inference file updated...")
     preds = preds.merge(df, on=["period", "subba"], how="left")
