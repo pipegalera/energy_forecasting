@@ -3,7 +3,7 @@ load_dotenv()
 import sys
 import os
 import datetime
-from utils import complete_timeframe, create_group_lags, create_group_rolling_means, create_date_colums
+from utils import complete_timeframe, create_horizon_dates, create_group_lags, create_group_rolling_means, create_date_colunms
 import pandas as pd
 import xgboost as xgb
 import argparse
@@ -11,20 +11,21 @@ import numpy as np
 import mlflow
 import json
 
-mlflow.set_tracking_uri(f"sqlite:///mlflow/mlflow.db")
 DATA_PATH = os.getenv("DATA_PATH")
 MODELS_PATH = os.getenv("MODELS_PATH")
+HOME_PATH = os.getenv("HOME_PATH")
+MLFLOW_PATH = os.getenv("MLFLOW_PATH")
 
 # Load RUN IDs from MLflow
-with open(f"{MODELS_PATH}/run_id_mapping.json", "r") as f:
+with open(f"{MLFLOW_PATH}/run_id_mapping.json", "r") as f:
     run_id_mapping = json.load(f)
 
-covs = ['value_lag_3', 'value_lag_6', 'value_lag_12',
-       'value_lag_24', 'value_lag_48', 'value_lag_168', 'value_lag_336',
-       'value_lag_720', 'value_lag_2160', 'value_rolling_mean_3_hours',
-       'value_rolling_mean_6_hours', 'value_rolling_mean_12_hours',
-       'value_rolling_mean_24_hours', 'value_rolling_mean_48_hours',
-       'value_rolling_mean_168_hours', 'value_rolling_mean_336_hours',
+covs = ['value_lag_3_hours', 'value_lag_6_hours', 'value_lag_12_hours',
+       'value_lag_24_hours', 'value_lag_48_hours', 'value_lag_168_hours',
+       'value_lag_336_hours', 'value_lag_720_hours', 'value_lag_2160_hours',
+       'value_rolling_mean_3_hours', 'value_rolling_mean_6_hours',
+       'value_rolling_mean_12_hours', 'value_rolling_mean_24_hours', 'value_rolling_mean_48_hours','value_rolling_mean_168_hours',
+       'value_rolling_mean_336_hours',
        'value_rolling_mean_720_hours', 'value_rolling_mean_2160_hours',
        'period_hour', 'period_day', 'period_week', 'period_year',
        'period_day_of_week', 'period_day_of_year', 'period_month_end',
@@ -32,25 +33,17 @@ covs = ['value_lag_3', 'value_lag_6', 'value_lag_12',
        'period_year_end', 'period_year_start']
 
 
-def create_horizon_dates(data, groups_column, days_before=False, days_after=0):
+import mlflow
+logged_model = 'runs:/9e3b337f44364bc6a0f4907c432880f5/xgboost_model_VEA'
 
-    df = data.copy()
+# Load model as a PyFuncModel.
+loaded_model = mlflow.pyfunc.load_model(logged_model)
 
-    horizon = df["period"].max() + datetime.timedelta(days=days_after)
-    if days_before:
-        last_period = df["period"].max() - datetime.timedelta(days=days_before)
-    else:
-        last_period = df["period"].max() + datetime.timedelta(hours=1)
+# Predict on a Pandas DataFrame.
+import pandas as pd
+loaded_model.predict(pd.DataFrame(data))
 
-    all_predictions_df = pd.DataFrame()
-    for i in df[groups_column].unique():
-        predictions_df = pd.date_range(last_period, horizon, freq='1h')
-        predictions_df = pd.DataFrame({"period":predictions_df})
-        predictions_df[groups_column] = i
 
-        all_predictions_df = pd.concat([all_predictions_df, predictions_df]).sort_values([groups_column, 'period'])
-
-    return all_predictions_df
 
 def make_predictions(data, covs = covs):
 
@@ -81,21 +74,20 @@ def make_predictions(data, covs = covs):
 
 def main(days):
 
+    # READ RAW DATA
     df = pd.read_parquet(f"{DATA_PATH}/data.parquet")
 
-    print(f"--> Creating new forecasts for the next {days} days...")
-    df_horizon = create_horizon_dates(data=df,
-                                      groups_column='subba',
-                                      days_before=days,
-                                      days_after=days)
-
     # PREP DATA
-    df_horizon = (df_horizon
+    print(f"--> Creating new forecasts...")
+    df_horizon = (df
+                    .pipe(complete_timeframe, bfill=True)
+                    .pipe(create_horizon_dates, 'subba', 14)
                     .pipe(create_group_lags, 'subba', ['value'], lags=[3,6,12,24,48,168,336,720,2160])
                     .pipe(create_group_rolling_means, 'subba', ['value'], windows=[3,6,12,24,48,168,336,720,2160])
-                    .pipe(create_date_colums, 'period')
+                    .pipe(create_date_colunms, 'period')
          )
-    df = df.sort_values(['subba', 'period'])
+    df_horizon = df_horizon.sort_values(['subba', 'period'])
+
 
     print("--> Loading models and running predictions...")
     preds = make_predictions(data=df_horizon, covs = covs)
