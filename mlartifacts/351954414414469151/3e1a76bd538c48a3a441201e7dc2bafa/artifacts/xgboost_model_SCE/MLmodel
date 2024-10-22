@@ -1,0 +1,54 @@
+artifact_path: xgboost_model_SCE
+flavors:
+  python_function:
+    data: model.xgb
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.xgboost
+    python_version: 3.11.10
+  xgboost:
+    code: null
+    data: model.xgb
+    model_class: xgboost.sklearn.XGBRegressor
+    model_format: xgb
+    xgb_version: 2.1.1
+mlflow_version: 2.17.0
+model_size_bytes: 4815488
+model_uuid: 3301d53f69c44a2e8e44856679252c30
+run_id: 3e1a76bd538c48a3a441201e7dc2bafa
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+signature:
+  inputs: '[{"type": "double", "name": "value_lag_3_hours", "required": false}, {"type":
+    "double", "name": "value_lag_6_hours", "required": false}, {"type": "double",
+    "name": "value_lag_12_hours", "required": false}, {"type": "double", "name": "value_lag_24_hours",
+    "required": false}, {"type": "double", "name": "value_lag_48_hours", "required":
+    false}, {"type": "double", "name": "value_lag_168_hours", "required": false},
+    {"type": "double", "name": "value_lag_336_hours", "required": false}, {"type":
+    "double", "name": "value_lag_720_hours", "required": false}, {"type": "double",
+    "name": "value_lag_2160_hours", "required": false}, {"type": "double", "name":
+    "value_rolling_mean_3_hours", "required": true}, {"type": "double", "name": "value_rolling_mean_6_hours",
+    "required": true}, {"type": "double", "name": "value_rolling_mean_12_hours", "required":
+    true}, {"type": "double", "name": "value_rolling_mean_24_hours", "required": true},
+    {"type": "double", "name": "value_rolling_mean_48_hours", "required": true}, {"type":
+    "double", "name": "value_rolling_mean_168_hours", "required": true}, {"type":
+    "double", "name": "value_rolling_mean_336_hours", "required": true}, {"type":
+    "double", "name": "value_rolling_mean_720_hours", "required": true}, {"type":
+    "double", "name": "value_rolling_mean_2160_hours", "required": true}, {"type":
+    "integer", "name": "period_hour", "required": true}, {"type": "integer", "name":
+    "period_day", "required": true}, {"type": "integer", "name": "period_week", "required":
+    true}, {"type": "integer", "name": "period_year", "required": true}, {"type":
+    "integer", "name": "period_day_of_week", "required": true}, {"type": "integer",
+    "name": "period_day_of_year", "required": true}, {"type": "boolean", "name": "period_month_end",
+    "required": true}, {"type": "boolean", "name": "period_month_start", "required":
+    true}, {"type": "boolean", "name": "period_quarter_end", "required": true}, {"type":
+    "boolean", "name": "period_quarter_start", "required": true}, {"type": "boolean",
+    "name": "period_year_end", "required": true}, {"type": "boolean", "name": "period_year_start",
+    "required": true}]'
+  outputs: '[{"type": "float", "required": true}]'
+  params: null
+utc_time_created: '2024-10-22 16:21:19.051783'

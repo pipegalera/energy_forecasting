@@ -1,0 +1,6 @@
+artifact_location: mlflow-artifacts:/351954414414469151
+creation_time: 1729613296169
+experiment_id: '351954414414469151'
+last_update_time: 1729613296169
+lifecycle_stage: active
+name: XGBoost_Energy_Forecasting
