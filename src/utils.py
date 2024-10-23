@@ -20,6 +20,8 @@ def complete_timeframe(data, bfill=False):
     if bfill==True:
         df['value'] = df.groupby('subba')['value'].bfill()
 
+    df["period"] = df["period"].dt.tz_localize("UTC")
+
     return df
 
 def create_horizon_dates(data, groups_column, days_after=0):
