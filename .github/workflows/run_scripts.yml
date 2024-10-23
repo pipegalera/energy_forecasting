@@ -24,11 +24,12 @@ jobs:
           load: true
           tags: energy-forecasting:latest
 
-      - name: Create data directory
-        run: mkdir -p ${{ github.workspace }}/data
-
-      - name: Create docs directory
-        run: mkdir -p ${{ github.workspace }}/docs
+      - name: Create directories
+        run: |
+          mkdir -p ${{ github.workspace }}/data
+          mkdir -p ${{ github.workspace }}/docs
+          mkdir -p ${{ github.workspace }}/mlartifacts/351954414414469151
+          mkdir -p ${{ github.workspace }}/mlruns/models
 
       - name: Run Docker container
         run: |
@@ -40,6 +41,7 @@ jobs:
             -v ${{ github.workspace }}/data:/app/data \
             -v ${{ github.workspace }}/docs:/app/docs \
             -v ${{ github.workspace }}/mlartifacts/351954414414469151:/mlartifacts/351954414414469151 \
+            -v ${{ github.workspace }}/mlruns/models:/app/models \
             energy-forecasting:latest \
             bash /app/run_scripts.sh
       - name: Commit and pull/push if it changed

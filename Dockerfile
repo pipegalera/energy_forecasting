@@ -7,7 +7,6 @@ RUN apt-get update && apt-get install -y
 
 COPY requirements.txt ./
 COPY src ./src
-COPY mlruns/models ./models
 COPY run_scripts.sh ./
 
 
