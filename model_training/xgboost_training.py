@@ -22,7 +22,6 @@ sys.path.append(os.getcwd())
 from src.utils import complete_timeframe, create_group_lags, create_group_rolling_means, create_date_columns
 
 
-
 # SET EXPERIMENT
 # bash -> mlflow server --host 127.0.0.1 --port 8080
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
@@ -33,28 +32,18 @@ mlflow.set_experiment(experiment_name)
 # READ DATA
 df = pd.read_parquet(DATA_PATH + "data.parquet")
 
+
 # PREP DATA
 df = (df
         .pipe(complete_timeframe, bfill=True)
-        .pipe(create_group_lags, 'subba', ['value'], lags=[3,6,12,24,48,168,336,720,2160])
-        .pipe(create_group_rolling_means, 'subba', ['value'], windows=[3,6,12,24,48,168,336,720,2160])
+        .pipe(create_group_lags, 'subba', ['value'], lags=[364*24])
+        .pipe(create_group_rolling_means, 'subba', ['value'], windows=[12*24,24*24,48*24,168*24,336*24,720*24])
         .pipe(create_date_columns, 'period')
      )
 df = df.sort_values(['subba', 'period'])
 
-
 # Covariates
-covs = ['value_lag_3_hours', 'value_lag_6_hours', 'value_lag_12_hours',
-       'value_lag_24_hours', 'value_lag_48_hours', 'value_lag_168_hours',
-       'value_lag_336_hours', 'value_lag_720_hours', 'value_lag_2160_hours',
-       'value_rolling_mean_3_hours', 'value_rolling_mean_6_hours',
-       'value_rolling_mean_12_hours', 'value_rolling_mean_24_hours', 'value_rolling_mean_48_hours','value_rolling_mean_168_hours',
-       'value_rolling_mean_336_hours',
-       'value_rolling_mean_720_hours', 'value_rolling_mean_2160_hours',
-       'period_hour', 'period_day', 'period_week', 'period_year',
-       'period_day_of_week', 'period_day_of_year', 'period_month_end',
-       'period_month_start', 'period_quarter_end', 'period_quarter_start',
-       'period_year_end', 'period_year_start']
+covs = df.columns.drop(['period', 'subba', 'subba-name', 'parent', 'parent-name', 'value', 'value-units'])
 
 # Optuna XGBoost model
 def objective(trial, data, group, target, covs, n_splits=5):
