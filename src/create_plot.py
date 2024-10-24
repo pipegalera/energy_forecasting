@@ -101,7 +101,6 @@ def main(data):
             font_size=12,
         ),
         hoverdistance=100,
-        spikedistance=1000,
         xaxis=dict(
             showspikes=True,
             spikethickness=2,
