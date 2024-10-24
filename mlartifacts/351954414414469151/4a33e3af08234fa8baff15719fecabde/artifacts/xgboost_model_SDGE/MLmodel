@@ -1,0 +1,41 @@
+artifact_path: xgboost_model_SDGE
+flavors:
+  python_function:
+    data: model.xgb
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.xgboost
+    python_version: 3.11.10
+  xgboost:
+    code: null
+    data: model.xgb
+    model_class: xgboost.sklearn.XGBRegressor
+    model_format: xgb
+    xgb_version: 2.1.1
+mlflow_version: 2.17.0
+model_size_bytes: 2829959
+model_uuid: 78e62f4b50924f52a1bab450bcacc1ef
+run_id: 4a33e3af08234fa8baff15719fecabde
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+signature:
+  inputs: '[{"type": "double", "name": "value_1_year_ago", "required": false}, {"type":
+    "double", "name": "value_2_year_ago", "required": false}, {"type": "double", "name":
+    "value_3_year_ago", "required": false}, {"type": "double", "name": "value_4_year_ago",
+    "required": false}, {"type": "integer", "name": "period_hour", "required": true},
+    {"type": "integer", "name": "period_day", "required": true}, {"type": "integer",
+    "name": "period_week", "required": true}, {"type": "integer", "name": "period_year",
+    "required": true}, {"type": "integer", "name": "period_day_of_week", "required":
+    true}, {"type": "integer", "name": "period_day_of_year", "required": true}, {"type":
+    "boolean", "name": "period_month_end", "required": true}, {"type": "boolean",
+    "name": "period_month_start", "required": true}, {"type": "boolean", "name": "period_quarter_end",
+    "required": true}, {"type": "boolean", "name": "period_quarter_start", "required":
+    true}, {"type": "boolean", "name": "period_year_end", "required": true}, {"type":
+    "boolean", "name": "period_year_start", "required": true}]'
+  outputs: '[{"type": "float", "required": true}]'
+  params: null
+utc_time_created: '2024-10-24 13:47:08.569313'
