@@ -29,18 +29,19 @@ experiment_name = "XGBoost_Energy_Forecasting"
 mlflow.set_experiment(experiment_name)
 
 
+
 # READ DATA
 df = pd.read_parquet(DATA_PATH + "data.parquet")
-
 
 # PREP DATA
 df = (df
         .pipe(complete_timeframe, bfill=True)
-        .pipe(create_group_lags, 'subba', ['value'], lags=[364*24])
-        .pipe(create_group_rolling_means, 'subba', ['value'], windows=[12*24,24*24,48*24,168*24,336*24,720*24])
+        .pipe(create_group_lags, 'subba', lags = [1,2,3,4])
         .pipe(create_date_columns, 'period')
      )
 df = df.sort_values(['subba', 'period'])
+#df = df.dropna(subset="value_4_year_ago")
+
 
 # Covariates
 covs = df.columns.drop(['period', 'subba', 'subba-name', 'parent', 'parent-name', 'value', 'value-units'])
