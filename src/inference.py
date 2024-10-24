@@ -56,13 +56,10 @@ def main(days=14):
     df_horizon = (df
                     .pipe(complete_timeframe, bfill=True)
                     .pipe(create_horizon_dates, 'subba', 14)
-                    .pipe(create_group_lags, 'subba', ['value'], lags=[3,6,12,24,48,168,336,720,2160])
-                    .pipe(create_group_rolling_means, 'subba', ['value'], windows=[3,6,12,24,48,168,336,720,2160])
+                    .pipe(create_group_lags, 'subba', lags = [1,2,3,4])
                     .pipe(create_date_columns, 'period')
          )
     df_horizon = df_horizon.sort_values(['subba', 'period'])
-
-    df_horizon.period.max()
 
     # Limit the data
     cutoff_date = pd.Timestamp.utcnow()  - datetime.timedelta(days=days)
@@ -76,10 +73,8 @@ def main(days=14):
     # Limit the horizon shows
     df_horizon.loc[df_horizon['period'] < cutoff_date, 'forecasted_value'] = np.nan
 
-
     # Delete columns
     preds = preds[["period", "subba", "value", "forecasted_value"]]
-    preds
 
     preds.to_parquet(f"{DATA_PATH}/inference.parquet")
     print(f"--> Done! Predictions saved at: {DATA_PATH}/inference.parquet")
