@@ -27,14 +27,14 @@ def main(data):
                     mode='lines',
                     name='Demand',
                     line=dict(color='rgb(31,119,180)'),
-                    hovertemplate='Demand: %{y:.2f} MWh'
+                    hovertemplate='%{y:.2f} MWh'
             ),
             go.Scatter(x=filtered_df.period,
                     y=filtered_df.forecasted_value,
                     mode='lines',
                     name='Demand Forecast',
                     line=dict(color='rgb(69,123,157)', dash='dash', width=2),
-                    hovertemplate='Forecast: %{y:.2f} MWh'
+                    hovertemplate='%{y:.2f} MWh'
             )
         ]
 
@@ -119,20 +119,6 @@ def main(data):
         ),
         # Add rangeslider and rangeselector here
         xaxis_rangeslider_visible=True,
-        xaxis_rangeselector=dict(
-            buttons=list([
-                dict(count=1, label="1d", step="day", stepmode="backward"),
-                dict(count=3, label="3d", step="day", stepmode="backward"),
-                dict(count=7, label="1w", step="day", stepmode="todate"),
-                dict(step="all")
-            ]),
-            y=1.02,
-            x=0.25,
-            yanchor="bottom",
-            font=dict(size=14),
-            bgcolor="rgba(255, 255, 255, 0.5)",
-            borderwidth=1,
-        ),
         updatemenus=[
             dict(
                 buttons=dropdown_buttons,

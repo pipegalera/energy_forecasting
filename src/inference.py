@@ -46,7 +46,7 @@ def make_predictions(data):
     return df
 
 
-def main(days=14):
+def main(days=7):
 
     # READ RAW DATA
     df = pd.read_parquet(f"{DATA_PATH}/data.parquet")
@@ -55,7 +55,7 @@ def main(days=14):
     print(f"--> Creating new forecasts...")
     df_horizon = (df
                     .pipe(complete_timeframe, bfill=True)
-                    .pipe(create_horizon_dates, 'subba', 14)
+                    .pipe(create_horizon_dates, 'subba', days)
                     .pipe(create_group_lags, 'subba', lags = [1,2,3,4])
                     .pipe(create_date_columns, 'period')
          )
@@ -64,6 +64,7 @@ def main(days=14):
     # Limit the data
     cutoff_date = pd.Timestamp.utcnow()  - datetime.timedelta(days=days)
     df_horizon = df_horizon.loc[df_horizon['period'] > cutoff_date]
+    print("--> Cutoff date:", cutoff_date)
     print("--> Min date:", df_horizon.period.min())
     print("--> Max date:", df_horizon.period.max())
 
@@ -81,4 +82,5 @@ def main(days=14):
     print("---------------------------------------------")
 
 if __name__=="__main__":
+
     main()
