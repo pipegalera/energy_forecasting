@@ -86,6 +86,7 @@ def main(data):
             family='"Open Sans", verdana, arial, sans-serif',
             size=12
         ),
+        margin=dict(t=130, b=0, l=10, r=0),
         title=f"California Demand for Electricity Forecast - Region: PGAE",
         xaxis_title="",
         yaxis_title="Megawatts-Hour",
@@ -144,5 +145,5 @@ def main(data):
 if __name__=="__main__":
     df = pd.read_parquet(f"{DATA_PATH}/inference.parquet")
     fig = main(df)
-    fig.write_html(f"{HOME_PATH}/docs/plot.html")
+    fig.write_html(f"{HOME_PATH}/docs/plot.html",config={'scrollZoom': False})
     print("--> Visualization updated!")
