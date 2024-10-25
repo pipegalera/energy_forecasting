@@ -20,13 +20,50 @@ def complete_timeframe(data, bfill=False):
     if bfill==True:
         df['value'] = df.groupby('subba')['value'].bfill()
 
+    df["period"] = df["period"].dt.tz_localize("UTC")
+    df["period"] = pd.to_datetime(df["period"])
+
     return df
-def create_group_lags(data, group_column, target_columns, lags):
+
+def create_horizon_dates(data, groups_column, days_after=0):
+
+    df = data.copy()
+
+    last_period = df["period"].max() + datetime.timedelta(hours=1)
+    horizon = df["period"].max() + datetime.timedelta(days=days_after)
+
+    all_predictions_df = pd.DataFrame()
+    for i in df[groups_column].unique():
+        predictions_df = pd.date_range(last_period, horizon, freq='1h')
+        predictions_df = pd.DataFrame({"period":predictions_df})
+        predictions_df[groups_column] = i
+
+        all_predictions_df = pd.concat([all_predictions_df, predictions_df])
+
+    return pd.concat([df, all_predictions_df]).sort_values([groups_column, 'period'])
+
+
+def create_group_lags_hours(data, group_column, target_columns, lags):
     df = data.copy()
     for col in target_columns:
         for lag in lags:
-            df[f'{col}_lag_{lag}'] = df.groupby(group_column)[col].shift(lag)
+            df[f'{col}_lag_{lag}_hours'] = df.groupby(group_column)[col].shift(lag)
         return df
+
+
+def create_group_lags(data, group_column, lags = [1,2,3,4]):
+
+    df = data.copy()
+
+    for lag in lags:
+        df_past = df[['period', group_column, 'value']].copy()
+        df_past['period'] = df_past['period'] + pd.DateOffset(years=lag)
+        df_past = df_past.rename(columns={'value': f'value_{lag}_year_ago'})
+        df = df.merge(df_past, on=['period', group_column], how='left')
+
+    return df
+
+
 def create_group_rolling_means(data, group_column, target_columns, windows):
 
     df = data.copy()
@@ -43,7 +80,8 @@ def create_group_rolling_means(data, group_column, target_columns, windows):
             )
 
     return df
-def create_date_colums(data, date_column):
+
+def create_date_columns(data, date_column):
 
     df = data.copy()
 

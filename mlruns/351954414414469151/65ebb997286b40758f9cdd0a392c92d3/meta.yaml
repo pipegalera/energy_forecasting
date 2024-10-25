@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/351954414414469151/65ebb997286b40758f9cdd0a392c92d3/artifacts
+end_time: 1729614850415
+entry_point_name: ''
+experiment_id: '351954414414469151'
+lifecycle_stage: active
+run_id: 65ebb997286b40758f9cdd0a392c92d3
+run_name: XGBoost_Optuna_VEA
+run_uuid: 65ebb997286b40758f9cdd0a392c92d3
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1729614526240
+status: 3
+tags: []
+user_id: pipegalera

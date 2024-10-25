@@ -5,11 +5,6 @@ on:
     - cron: "0 0 * * *"
   workflow_dispatch: # This allows manual triggering
 
-env:
-  DATA_PATH: ${{ secrets.DATA_PATH }}
-  EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
-  MODELS_PATH: ${{ secrets.MODELS_PATH }}
-
 jobs:
   refresh_data:
     runs-on: ubuntu-latest
@@ -29,11 +24,12 @@ jobs:
           load: true
           tags: energy-forecasting:latest
 
-      - name: Create data directory
-        run: mkdir -p ${{ github.workspace }}/data
-
-      - name: Create docs directory
-        run: mkdir -p ${{ github.workspace }}/docs
+      - name: Create directories
+        run: |
+          mkdir -p ${{ github.workspace }}/data
+          mkdir -p ${{ github.workspace }}/docs
+          mkdir -p ${{ github.workspace }}/mlruns/models
+          mkdir -p ${{ github.workspace }}/mlartifacts/351954414414469151
 
       - name: Run Docker container
         run: |
@@ -44,6 +40,8 @@ jobs:
             -e HOME_PATH=${{ secrets.HOME_PATH }} \
             -v ${{ github.workspace }}/data:/app/data \
             -v ${{ github.workspace }}/docs:/app/docs \
+            -v ${{ github.workspace }}/mlruns/models:/app/mlruns/models \
+            -v ${{ github.workspace }}/mlartifacts/351954414414469151:/app/mlartifacts/351954414414469151 \
             energy-forecasting:latest \
             bash /app/run_scripts.sh
       - name: Commit and pull/push if it changed

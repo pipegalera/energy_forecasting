@@ -27,14 +27,14 @@ def main(data):
                     mode='lines',
                     name='Demand',
                     line=dict(color='rgb(31,119,180)'),
-                    hovertemplate='Demand: %{y:.2f} MWh'
+                    hovertemplate='%{y:.2f} MWh'
             ),
             go.Scatter(x=filtered_df.period,
                     y=filtered_df.forecasted_value,
                     mode='lines',
                     name='Demand Forecast',
                     line=dict(color='rgb(69,123,157)', dash='dash', width=2),
-                    hovertemplate='Forecast: %{y:.2f} MWh'
+                    hovertemplate='%{y:.2f} MWh'
             )
         ]
 
@@ -86,6 +86,7 @@ def main(data):
             family='"Open Sans", verdana, arial, sans-serif',
             size=12
         ),
+        margin=dict(t=130, b=0, l=10, r=0),
         title=f"California Demand for Electricity Forecast - Region: PGAE",
         xaxis_title="",
         yaxis_title="Megawatts-Hour",
@@ -101,7 +102,6 @@ def main(data):
             font_size=12,
         ),
         hoverdistance=100,
-        spikedistance=1000,
         xaxis=dict(
             showspikes=True,
             spikethickness=2,
@@ -119,20 +119,6 @@ def main(data):
         ),
         # Add rangeslider and rangeselector here
         xaxis_rangeslider_visible=True,
-        xaxis_rangeselector=dict(
-            buttons=list([
-                dict(count=1, label="1d", step="day", stepmode="backward"),
-                dict(count=3, label="3d", step="day", stepmode="backward"),
-                dict(count=7, label="1w", step="day", stepmode="todate"),
-                dict(step="all")
-            ]),
-            y=1.02,
-            x=0.25,
-            yanchor="bottom",
-            font=dict(size=14),
-            bgcolor="rgba(255, 255, 255, 0.5)",
-            borderwidth=1,
-        ),
         updatemenus=[
             dict(
                 buttons=dropdown_buttons,
@@ -159,5 +145,5 @@ def main(data):
 if __name__=="__main__":
     df = pd.read_parquet(f"{DATA_PATH}/inference.parquet")
     fig = main(df)
-    fig.write_html(f"{HOME_PATH}/docs/plot.html")
+    fig.write_html(f"{HOME_PATH}/docs/plot.html",config={'scrollZoom': False})
     print("--> Visualization updated!")
