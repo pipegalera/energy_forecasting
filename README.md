@@ -19,8 +19,10 @@ This dashboard shows the latest data on electricity demand for the main 4 primar
 - `Visualization`: Plotly.
 - `Deployment`: Github pages ([Live Dashboard](https://pipegalera.github.io/energy_forecasting/))
 
-## TO-DO
+## ToDo
 
 - [ ] Unit testing.
 - [ ] Include MAPE metric within the visualization.
 - [ ] Prediction Interval based on bootstrapping. (https://otexts.com/fpp2/bootstrap.html)
+- [ ] LGBM Experiment.
+- [ ] Catboost Experiment.
