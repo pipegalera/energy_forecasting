@@ -61,6 +61,7 @@ def objective(trial, data, group, target, covs, n_splits=5):
 
     model = xgb.XGBRegressor(early_stopping_rounds=100, **params)
 
+    # Train/Test split
     tss = TimeSeriesSplit(n_splits=n_splits, test_size=24*365*1, gap=24)
     df_group = data[(data["subba"] == group)].set_index("period").sort_index()
 
