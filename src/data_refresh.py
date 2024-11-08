@@ -1,9 +1,15 @@
-from data_backfill import eia_backfill_data
-import pandas as pd
-import os
-from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 load_dotenv()
+import os
+import sys
+
+HOME_PATH = os.getenv("HOME_PATH")
+os.chdir(HOME_PATH)
+sys.path.append(os.getcwd())
+
+import pandas as pd
+from datetime import datetime, timedelta, timezone
+from src.data_backfill import eia_backfill_data
 
 DATA_PATH = os.getenv("DATA_PATH")
 EIA_API_KEY = os.getenv('EIA_API_KEY')
