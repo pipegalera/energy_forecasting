@@ -1,0 +1,40 @@
+artifact_path: lightgbm_model_PGAE
+flavors:
+  lightgbm:
+    code: null
+    data: model.pkl
+    lgb_version: 4.5.0
+    model_class: lightgbm.sklearn.LGBMRegressor
+  python_function:
+    data: model.pkl
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.lightgbm
+    python_version: 3.11.10
+mlflow_version: 2.17.0
+model_size_bytes: 4057538
+model_uuid: 0e41d172130b492eb4026a8ddad0acf8
+run_id: f71bbaf039f74dbc98b954f55aaef001
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+signature:
+  inputs: '[{"type": "double", "name": "value_1_year_ago", "required": false}, {"type":
+    "double", "name": "value_2_year_ago", "required": false}, {"type": "double", "name":
+    "value_3_year_ago", "required": false}, {"type": "double", "name": "value_4_year_ago",
+    "required": false}, {"type": "integer", "name": "period_hour", "required": true},
+    {"type": "integer", "name": "period_day", "required": true}, {"type": "integer",
+    "name": "period_week", "required": true}, {"type": "integer", "name": "period_year",
+    "required": true}, {"type": "integer", "name": "period_day_of_week", "required":
+    true}, {"type": "integer", "name": "period_day_of_year", "required": true}, {"type":
+    "boolean", "name": "period_month_end", "required": true}, {"type": "boolean",
+    "name": "period_month_start", "required": true}, {"type": "boolean", "name": "period_quarter_end",
+    "required": true}, {"type": "boolean", "name": "period_quarter_start", "required":
+    true}, {"type": "boolean", "name": "period_year_end", "required": true}, {"type":
+    "boolean", "name": "period_year_start", "required": true}]'
+  outputs: '[{"type": "double", "required": true}]'
+  params: null
+utc_time_created: '2024-11-08 18:35:16.659111'
