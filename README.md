@@ -24,5 +24,5 @@ This dashboard shows the latest data on electricity demand for the main 4 primar
 - [ ] Unit testing.
 - [ ] Include MAPE metric within the visualization.
 - [ ] Prediction Interval based on bootstrapping. (https://otexts.com/fpp2/bootstrap.html)
-- [ ] LGBM Experiment.
-- [ ] Catboost Experiment.
+- [x] LGBM Experiment.
+- [x] Catboost Experiment.
