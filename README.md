@@ -11,18 +11,14 @@ This dashboard shows the latest data on electricity demand for the main 4 primar
 - San Diego Gas and Electric (SDGE)
 - Valley Electric Association (VEA)
 
-## Technologies
+The `data` (US hourly demand for electricity) comes from EIA API. The predictions are made with `XGBoost` trained via `Optuna` for hypertunning. I tracked experiments and select the best models via `MLflow`.
+The visualization is made with `plotly` package.
 
-- `Data`: US hourly demand for electricity data from EIA API.
-- `ML`: The predictions are made using`XGBoost`, trained via `Optuna` for hypertunning, and tracked experiments to select better models via `MLflow`.
-- `Automatization`: The data, the forecasting, and the visualization is refreshed daily using a `Docker` image run via `Github Actions`.
-- `Visualization`: Plotly.
-- `Deployment`: Github pages ([Live Dashboard](https://pipegalera.github.io/energy_forecasting/))
+The data, forecasting, and visualization is refreshed daily using a `Docker` image run via `Github Actions` and deployed in a `Github page`.
 
-## ToDo
 
-- [ ] Unit testing.
+## TODO
+
 - [ ] Include MAPE metric within the visualization.
-- [ ] Prediction Interval based on bootstrapping. (https://otexts.com/fpp2/bootstrap.html)
-- [x] LGBM Experiment.
-- [x] Catboost Experiment.
+- [ ] Prediction Interval based on bootstrapping (https://otexts.com/fpp2/bootstrap.html) .
+- [ ] Unit testing.
